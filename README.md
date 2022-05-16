@@ -17,15 +17,15 @@ Alguns blocos possuem poderes especiais, tais como:
 
 Background do mapa feito pelo [bvigec](https://www.deviantart.com/bvigec)
 
-==Se você possui direito em alguns dos componentes gráficos usados nesse projeto e deseja que eles sejam creditados ou removidos, [entre em contato comigo](mailto:marcioaduil@gmail.com).==
+***Se você possui direito em alguns dos componentes gráficos usados nesse projeto e deseja que eles sejam creditados ou removidos, [entre em contato comigo](mailto:marcioaduil@gmail.com).***
 
 ## Principais comandos
 
-| Ação                        | Comando                       |
-| --------------------------- | ----------------------------- |
-| Iniciar jogo                | <kbd>Space</kbd>              |
-| Mover plataforma            | <kbd><-</kbd> e <kbd>-></kbd> |
-| Pausar/Abrir menu principal | <kbd>ESC</kbd>                |
+| Ação                        | Comando                                 |
+| --------------------------- | --------------------------------------- |
+| Iniciar jogo                | <kbd>Space</kbd>                        |
+| Mover plataforma            | <kbd>&#8592;</kbd> e <kbd>&#8594;</kbd> |
+| Pausar/Abrir menu principal | <kbd>ESC</kbd>                          |
 
 ## Instruções
 
