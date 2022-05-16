@@ -1,6 +1,6 @@
 ![Logotipo do Block Breaker](res/logo.png)
 
-# Block Kreaker
+# Block Breaker
 
 Block Breaker é um jogo feito em Java, Swing e AWT que construí durante minha graduação, baseado no clássico [Breakout do Atari 2600](https://pt.wikipedia.org/wiki/Breakout_(jogo_eletr%C3%B4nico)).
 
