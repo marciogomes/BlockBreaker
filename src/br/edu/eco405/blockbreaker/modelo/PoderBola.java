@@ -74,10 +74,6 @@ public class PoderBola implements Poderes {
                     break;
 
             }
-        } else {
-            // 
         }
-
     }
-
 }

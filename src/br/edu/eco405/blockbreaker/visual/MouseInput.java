@@ -25,12 +25,12 @@ public class MouseInput implements MouseListener {
         int x = e.getX();
         int y = e.getY();
 
-        if (PanelJogo.D) {
+        if (PanelJogo.DEBUG_MODE) {
             switch (PanelJogo.state) {
                 case MENU:
                     // inicia o jogo
                     if (x >= 40 && x <= 190 && y >= 440 && y <= 470) {
-                        if (PanelJogo.U) {
+                        if (PanelJogo.USER_MODE) {
                             SoundEffects.MENU_CLICK.play();
                         }
 
@@ -50,7 +50,7 @@ public class MouseInput implements MouseListener {
                     if (x >= 40 && x <= 190 && y >= 440 && y <= 470) {
 
                         PanelJogo.state = PanelJogo.STATE.GAME;
-                        PanelJogo.t.restart();
+                        PanelJogo.timer.restart();
                     }
 
                     // sai do jogo
@@ -66,7 +66,7 @@ public class MouseInput implements MouseListener {
             }
         }
 
-        if (PanelJogo.U) {
+        if (PanelJogo.USER_MODE) {
             switch (PanelJogo.state) {
                 case MENU:
                     // inicia o jogo
@@ -80,7 +80,7 @@ public class MouseInput implements MouseListener {
                         SoundEffects.MENU_CLICK.play();
 
                         JOptionPane.showMessageDialog(null, "Marcio Gomes "
-                                + "25038", "About", 1);
+                                + "25038", "About", JOptionPane.INFORMATION_MESSAGE);
                     }
 
                     // sai do jogo
@@ -96,7 +96,7 @@ public class MouseInput implements MouseListener {
                         SoundEffects.MENU_CLICK.play();
 
                         PanelJogo.state = PanelJogo.STATE.GAME;
-                        PanelJogo.t.restart();
+                        PanelJogo.timer.restart();
                     }
 
                     if (x >= 200 && x <= 450 && y >= 375 && y <= 425) {

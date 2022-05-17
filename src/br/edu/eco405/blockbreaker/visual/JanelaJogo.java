@@ -14,21 +14,24 @@ import javax.swing.JFrame;
  */
 public class JanelaJogo {
 
+    private static final String FRAME_TITLE = "Block Breaker";
+    private static final int FRAME_WIDTH = 650;
+    private static final int FRAME_HEIGHT = 600;
+
     public static void main(String[] args) throws IOException {
         new Runnable() {
 
             @Override
             public void run() {
                 try {
-                    JFrame janela = new JFrame("Block Breaker");
+                    JFrame janela = new JFrame(FRAME_TITLE);
                     janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    janela.setSize(650, 600);
+                    janela.setSize(FRAME_WIDTH, FRAME_HEIGHT);
                     janela.setLocationRelativeTo(null);
                     janela.setResizable(false);
                     janela.add(new PanelJogo());
                     janela.setVisible(true);
                 } catch (IOException e) {
-                    //Logger.getLogger(JanelaJogo.class.getName()).log(Level.SEVERE, null, ex);
                     e.printStackTrace();
                 }
             }

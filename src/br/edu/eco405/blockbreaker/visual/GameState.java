@@ -5,13 +5,11 @@
  */
 package br.edu.eco405.blockbreaker.visual;
 
-import java.awt.Graphics2D;
-
 /**
  *
  * @author Márcio
  */
 public interface GameState {
-    public void paint();
-    public void dispose();
+    void paint();
+    void dispose();
 }

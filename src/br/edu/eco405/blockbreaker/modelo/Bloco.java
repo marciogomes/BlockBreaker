@@ -10,11 +10,11 @@ package br.edu.eco405.blockbreaker.modelo;
  * @author Márcio
  */
 public class Bloco extends GameObject {
-    public static enum STATE {
+    public enum STATE {
         NORMAL,
         DANIFICADO,
         MUITO_DANIFICADO,
-        DESTRUIDO;
+        DESTRUIDO
     }
     
     private int vida;

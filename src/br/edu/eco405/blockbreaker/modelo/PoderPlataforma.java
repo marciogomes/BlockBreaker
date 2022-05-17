@@ -5,8 +5,6 @@
  */
 package br.edu.eco405.blockbreaker.modelo;
 
-import java.awt.Rectangle;
-
 /**
  *
  * @author Márcio
@@ -50,9 +48,6 @@ public class PoderPlataforma implements Poderes {
                     plataforma.setLife(plataforma.getLife()+1);
                     break;
             }
-        } else {
-            // 
         }
     }
-
 }

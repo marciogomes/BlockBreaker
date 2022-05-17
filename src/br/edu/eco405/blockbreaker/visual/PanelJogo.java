@@ -39,11 +39,9 @@ import java.io.IOException;
  */
 public class PanelJogo extends JPanel {
 
-    /* Debugger */
-    public static boolean D = false;
-    public static boolean U = true;
+    public static final boolean DEBUG_MODE = false;
+    public static final boolean USER_MODE = true;
 
-    /* Constantes */
     public static final int FPS = 60;
     public static final int INIT_LIFE = 3;
 
@@ -62,9 +60,8 @@ public class PanelJogo extends JPanel {
     public static final int PLAT_MASK_HEIGHT = 20;
     public static final double PLAT_VELOCIDADE = 10.0;
 
-    /* Componentes do jogo */
     private User user;
-    public static Timer t;
+    public static Timer timer;
 
     private Bola bola;
     public static ArrayList<Bola> bolas;
@@ -77,26 +74,19 @@ public class PanelJogo extends JPanel {
 
     private GameObject paredeCima;
     private GameObject paredeBaixo;
-    private GameObject paredeDir;
-    private GameObject paredeEsq;
+    private GameObject paredeDireita;
+    private GameObject paredeEsquerda;
 
-    private File fileMapa;
-
-    // estado do jogo
-    public static enum STATE {
-
+    public enum STATE {
         MENU,
         GAME,
         PAUSE,
         GAME_OVER
-    };
+    }
 
     public static STATE state = STATE.MENU; // jogo começa no menu principal
 
-    /* Variaveis auxiliares */
-    //private int sx = 1;                     // direção em X
-    //private int sy = 1;                     // direção em Y
-    private int[] setas = new int[2];       // vetor para evitar delay do teclado
+    private final int[] setas = new int[2];       // vetor para evitar delay do teclado
 
     private boolean flagRun;        // flag para quando o usuario inicia o jogo
     private boolean flagWin;
@@ -149,19 +139,20 @@ public class PanelJogo extends JPanel {
         plataforma.setState(Plataforma.STATE.NORMAL);
 
         /* Inicia o mapa */
-        fileMapa = new File("res/mapas/mapa1.txt");
+        File fileMapa = new File("res/mapas/mapa1.txt");
         if (!fileMapa.exists()) {
             System.out.println("Arquivo de mapa não encontrado! Encerrando...");
             this.setVisible(false); // poderia fechar o programa
         }
 
         blocos = new ArrayList<>();
-        FileReader frMapa = new FileReader(fileMapa);
-        BufferedReader bfMapa = new BufferedReader(frMapa);
-        String[] strMapa = new String[10];
+        BufferedReader readerMapa = new BufferedReader(
+                new FileReader(fileMapa)
+        );
+        String[] mapa = new String[10];
         int k = 0;
-        while (bfMapa.ready()) {
-            strMapa[k++] = bfMapa.readLine();
+        while (readerMapa.ready()) {
+            mapa[k++] = readerMapa.readLine();
         }
 
         for (int i = 0; i < 10; i++) {
@@ -173,9 +164,9 @@ public class PanelJogo extends JPanel {
                 b.setY(80 + 30 * i);
 
                 // le o arquivo de mapa e ve o tipo de bloco
-                switch (strMapa[i].charAt(j)) {
+                switch (mapa[i].charAt(j)) {
                     case '#': // bloco indestruivel
-                        b.setDestrutivel(false); // bloco indestrutível
+                        b.setDestrutivel(false);
                         b.setVida(-1);
                         b.setPowerfull(false);
                         b.setPoder(null);
@@ -297,17 +288,17 @@ public class PanelJogo extends JPanel {
         paredeBaixo.setX(paredeBaixo.getMaskX());
         paredeBaixo.setY(paredeBaixo.getMaskY());
 
-        paredeEsq = new GameObject();
-        paredeEsq.setMask(new Rectangle(1, 26, 1, 533));
-        paredeEsq.setX(paredeEsq.getMaskX());
-        paredeEsq.setY(paredeEsq.getMaskY());
+        paredeEsquerda = new GameObject();
+        paredeEsquerda.setMask(new Rectangle(1, 26, 1, 533));
+        paredeEsquerda.setX(paredeEsquerda.getMaskX());
+        paredeEsquerda.setY(paredeEsquerda.getMaskY());
 
-        paredeDir = new GameObject();
-        paredeDir.setMask(new Rectangle(632, 26, 1, 533));
-        paredeDir.setX(paredeDir.getMaskX());
-        paredeDir.setY(paredeDir.getMaskY());
+        paredeDireita = new GameObject();
+        paredeDireita.setMask(new Rectangle(632, 26, 1, 533));
+        paredeDireita.setX(paredeDireita.getMaskX());
+        paredeDireita.setY(paredeDireita.getMaskY());
 
-        if (U) {
+        if (USER_MODE) {
             SoundEffects.init();
         }
 
@@ -320,7 +311,7 @@ public class PanelJogo extends JPanel {
 
     void loop() {
 
-        t = new Timer(1000 / FPS, new ActionListener() {
+        timer = new Timer(1000 / FPS, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -328,27 +319,27 @@ public class PanelJogo extends JPanel {
                 /* Verifica se o jogo reiniciou */
                 /* Verifica se o jogador morreu */
                 if (plataforma.getLife() == 0) {
-                    if (D) {
+                    if (DEBUG_MODE) {
                         System.out.printf("PERDEU O JOGO\n");
                         System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                 bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                     }
-                    if (U) {
+                    if (USER_MODE) {
                         SoundEffects.GAME_OVER.play();
                     }
                     state = STATE.GAME_OVER;
-                    t.stop();
+                    timer.stop();
                 }
 
                 /* Verifica se o jogador ganhou */
                 if (blocos.isEmpty()) {
-                    if (D) {
+                    if (DEBUG_MODE) {
                         System.out.printf("GANHOU O JOGO\n");
                         System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                 bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                     }
                     flagWin = true;
-                    t.stop();
+                    timer.stop();
                 }
 
                 /* Calcula o próximo movimento */
@@ -385,28 +376,28 @@ public class PanelJogo extends JPanel {
                 /* Detecta as colisões */
                 // Colisão bola - parede
                 for (int i = 0; i < bolas.size(); i++) {
-                    if (colisao(bolas.get(i), paredeEsq)) {
-                        if (D) {
+                    if (colisao(bolas.get(i), paredeEsquerda)) {
+                        if (DEBUG_MODE) {
                             System.out.printf("COLISAO BOLA - PAREDE ESQ\n");
                             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                     bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                         }
 
-                        if (U) {
+                        if (USER_MODE) {
                             SoundEffects.BALL.play();
                         }
 
                     }
                 }
                 for (int i = 0; i < bolas.size(); i++) {
-                    if (colisao(bolas.get(i), paredeDir)) {
-                        if (D) {
+                    if (colisao(bolas.get(i), paredeDireita)) {
+                        if (DEBUG_MODE) {
                             System.out.printf("COLISAO BOLA - PAREDE DIR\n");
                             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                     bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                         }
 
-                        if (U) {
+                        if (USER_MODE) {
                             SoundEffects.BALL.play();
                         }
 
@@ -414,13 +405,13 @@ public class PanelJogo extends JPanel {
                 }
                 for (int i = 0; i < bolas.size(); i++) {
                     if (colisao(bolas.get(i), paredeCima)) {
-                        if (D) {
+                        if (DEBUG_MODE) {
                             System.out.printf("COLISAO BOLA - PAREDE CIMA\n");
                             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                     bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                         }
 
-                        if (U) {
+                        if (USER_MODE) {
                             SoundEffects.BALL.play();
                         }
 
@@ -430,7 +421,7 @@ public class PanelJogo extends JPanel {
                 for (int i = 0; i < bolas.size(); i++) {
                     if (colisao(bolas.get(i), paredeBaixo)) {
 
-                        if (D) {
+                        if (DEBUG_MODE) {
                             System.out.printf("PERDEU UMA VIDA\n");
                             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                     bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
@@ -465,7 +456,7 @@ public class PanelJogo extends JPanel {
                             plataforma.setState(Plataforma.STATE.NORMAL);
                             // volta ao dano padrão
 
-                            if ((plataforma.getLife() > 0) && U) {
+                            if ((plataforma.getLife() > 0) && USER_MODE) {
                                 SoundEffects.LIFE_LOST.play();
                             }
                         }
@@ -476,13 +467,13 @@ public class PanelJogo extends JPanel {
                 // Colisão bola - plataforma
                 for (int i = 0; i < bolas.size(); i++) {
                     if (colisao(bolas.get(i), plataforma)) {
-                        if (D) {
+                        if (DEBUG_MODE) {
                             System.out.printf("COLISAO BOLA - PLATAFORMA\n");
                             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                     bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                         }
 
-                        if (U) {
+                        if (USER_MODE) {
                             SoundEffects.BALL.play();
                         }
 
@@ -503,15 +494,15 @@ public class PanelJogo extends JPanel {
                 }
 
                 // Colisão plataforma - parede
-                if (colisao(plataforma, paredeEsq)) {
-                    if (D) {
+                if (colisao(plataforma, paredeEsquerda)) {
+                    if (DEBUG_MODE) {
                         System.out.printf("COLISAO PLATAFORMA - PAREDE ESQ\n");
                         System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                 bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                     }
                 }
-                if (colisao(plataforma, paredeDir)) {
-                    if (D) {
+                if (colisao(plataforma, paredeDireita)) {
+                    if (DEBUG_MODE) {
                         System.out.printf("COLISAO PLATAFORMA - PAREDE DIR\n");
                         System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                 bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
@@ -522,7 +513,7 @@ public class PanelJogo extends JPanel {
                 for (int i = 0; i < bolas.size(); i++) {
                     for (int j = 0; j < blocos.size(); j++) {
                         if (colisao(bolas.get(i), blocos.get(j))) {
-                            if (D) {
+                            if (DEBUG_MODE) {
                                 System.out.printf("COLISAO BOLA - BLOCO %d\n", i);
                                 System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                         bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
@@ -531,7 +522,7 @@ public class PanelJogo extends JPanel {
                             if (blocos.get(j).isDestrutivel()) { // se o bloco for destrutível
 
                                 // sonzinho da zueira
-                                if (U) {
+                                if (USER_MODE) {
                                     SoundEffects.EXPLODE.play();
                                 }
 
@@ -541,7 +532,7 @@ public class PanelJogo extends JPanel {
                                 // se o bloco tiver poder, ative-o e depois remova-o
                                 if (blocos.get(j).isPowerfull()) {
 
-                                    if (U) {
+                                    if (USER_MODE) {
                                         SoundEffects.POWER.play();
                                     }
 
@@ -573,7 +564,7 @@ public class PanelJogo extends JPanel {
                                     blocos.remove(j);
                                 }
                             } else {
-                                if (U) {
+                                if (USER_MODE) {
                                     SoundEffects.BLOCO_IND_HIT.play();
                                 }
                             }
@@ -595,13 +586,13 @@ public class PanelJogo extends JPanel {
 
         });
 
-        if (D) {
+        if (DEBUG_MODE) {
             System.out.printf("INICIO LOG\n");
             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                     bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
         }
 
-        t.start();
+        timer.start();
     }
 
     void inputData() {
@@ -621,7 +612,7 @@ public class PanelJogo extends JPanel {
 
                         case KeyEvent.VK_SPACE:
                             if (!flagRun) {
-                                if (D) {
+                                if (DEBUG_MODE) {
                                     System.out.printf("INICIO JOGO\n\n");
                                     System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                             bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
@@ -632,28 +623,28 @@ public class PanelJogo extends JPanel {
                             break;
 
                         case KeyEvent.VK_ESCAPE:
-                            if (D) {
+                            if (DEBUG_MODE) {
                                 System.out.printf("PAUSA\n\n");
                                 System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                         bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                             }
 
-                            if (U) {
+                            if (USER_MODE) {
                                 SoundEffects.MENU_CLICK.play();
                             }
 
                             if (state == STATE.GAME) {
                                 state = STATE.PAUSE;
-                                t.stop();
+                                timer.stop();
                                 repaint();
                             } else {
                                 state = STATE.GAME;
-                                t.restart();
+                                timer.restart();
                             }
                             break;
 
                         case KeyEvent.VK_LEFT:
-                            if (D) {
+                            if (DEBUG_MODE) {
                                 System.out.printf("DIRECIONAL ESQUERDO\n");
                                 System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                         bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
@@ -662,7 +653,7 @@ public class PanelJogo extends JPanel {
                             break;
 
                         case KeyEvent.VK_RIGHT:
-                            if (D) {
+                            if (DEBUG_MODE) {
                                 System.out.printf("DIRECIONAL DIREITO\n");
                                 System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                         bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
@@ -757,7 +748,7 @@ public class PanelJogo extends JPanel {
                 RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        if (D) {
+        if (DEBUG_MODE) {
 
             plataforma.setLife(-1);
 
@@ -791,8 +782,8 @@ public class PanelJogo extends JPanel {
             g2d.setColor(Color.BLACK);
             g2d.draw(paredeCima.getMask());
             g2d.draw(paredeBaixo.getMask());
-            g2d.draw(paredeDir.getMask());
-            g2d.draw(paredeEsq.getMask());
+            g2d.draw(paredeDireita.getMask());
+            g2d.draw(paredeEsquerda.getMask());
 
             /* INFO */
             g2d.drawString("STATE" + " = " + state, 1, 15);
@@ -828,7 +819,7 @@ public class PanelJogo extends JPanel {
             }
 
         }
-        if (U) {
+        if (USER_MODE) {
 
             g2d.drawImage(imageBackground.getImage(), 0, 0, this);
 

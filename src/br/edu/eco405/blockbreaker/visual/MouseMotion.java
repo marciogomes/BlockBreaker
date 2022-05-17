@@ -26,7 +26,7 @@ public class MouseMotion implements MouseMotionListener {
         int x = e.getX();
         int y = e.getY();
 
-        if (PanelJogo.D) {
+        if (PanelJogo.DEBUG_MODE) {
             switch (PanelJogo.state) {
                 case MENU:
                     // inicia o jogo
@@ -60,7 +60,7 @@ public class MouseMotion implements MouseMotionListener {
             }
         }
 
-        if (PanelJogo.U) {
+        if (PanelJogo.USER_MODE) {
 
             if (PanelJogo.state != PanelJogo.STATE.GAME && PanelJogo.state != PanelJogo.STATE.GAME_OVER) {
 

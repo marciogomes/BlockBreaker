@@ -26,7 +26,7 @@ public enum SoundEffects {
     MENU_ENTER("res/sons/menu_enter.wav");
 
     // Nested class for specifying volume
-    public static enum Volume {
+    public enum Volume {
 
         MUTE, LOW, MEDIUM, HIGH
     }

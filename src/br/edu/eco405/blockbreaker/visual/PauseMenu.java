@@ -28,7 +28,7 @@ public class PauseMenu implements GameState {
     @Override
     public void paint() {
 
-        if (PanelJogo.D) {
+        if (PanelJogo.DEBUG_MODE) {
 
             Rectangle resumeButton = new Rectangle(40, 440, 150, 30);
             Rectangle restartButton = new Rectangle(240, 440, 150, 30);
@@ -51,7 +51,7 @@ public class PauseMenu implements GameState {
             g2d.drawString("QUIT", 490, 460);
         }
 
-        if (PanelJogo.U) {
+        if (PanelJogo.USER_MODE) {
 
             Rectangle playButton = new Rectangle(200, 300, 250, 50);
             Rectangle restartButton = new Rectangle(200, 375, 250, 50);

@@ -7,12 +7,12 @@ package br.edu.eco405.blockbreaker.modelo;
 
 public class Plataforma extends PlayerObject {
 
-    public static enum STATE {
+    public enum STATE {
 
         NORMAL,
         GRANDE,
-        MUITO_GRANDE;
-    };
+        MUITO_GRANDE
+    }
 
     private STATE state = STATE.NORMAL;
 
