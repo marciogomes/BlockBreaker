@@ -11,7 +11,7 @@ Alguns blocos possuem poderes especiais, tais como:
 - Aumentar velocidade e tamanho da plataforma
 - Aumentar velocidade e tamanho da bola
 - Inserir mais bolas na tela
-- Aumentar o poder destrutivo da bola
+- Aumentar o poderManager destrutivo da bola
 
 ## Créditos
 
@@ -40,13 +40,13 @@ O mapa é composto por uma matriz 10x7 que pode ser preenchido **obrigatoriament
 | Valor | Tipo de bloco                                                 |
 | ----- | ------------------------------------------------------------- |
 | 1     | Bloco normal                                                  |
-| 2     | Bloco com poder de aumentar vida em 1 un.                     |
-| 3     | Bloco com poder de aumentar velocidade da plataforma em 1 un. |
-| 4     | Bloco com poder de aumentar tamanho da plataforma em 1 un.    |
-| 5     | Bloco com poder de aumentar dano da bola em 1 un.             |
-| 6     | Bloco com poder de aumentar tamanho da bola em 1 un.          |
-| 7     | Bloco com poder de aumentar velocidade da bola em 1 un.       |
-| 8     | Bloco com poder de adicionar uma bola na tela                 |
+| 2     | Bloco com poderManager de aumentar vida em 1 un.                     |
+| 3     | Bloco com poderManager de aumentar velocidade da plataforma em 1 un. |
+| 4     | Bloco com poderManager de aumentar tamanho da plataforma em 1 un.    |
+| 5     | Bloco com poderManager de aumentar dano da bola em 1 un.             |
+| 6     | Bloco com poderManager de aumentar tamanho da bola em 1 un.          |
+| 7     | Bloco com poderManager de aumentar velocidade da bola em 1 un.       |
+| 8     | Bloco com poderManager de adicionar uma bola na tela                 |
 | \#    | Bloco indestrutível                                           |
 | \-    | Não imprime bloco na tela                                     |
 

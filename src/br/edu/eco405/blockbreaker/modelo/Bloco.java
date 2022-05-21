@@ -18,27 +18,27 @@ public class Bloco extends GameObject {
     }
     
     private int vida;
-    private Poderes poder;
+    private PoderManager poderManager;
     private boolean destrutivel;
     private boolean powerfull;
     private STATE state;
     
-    private String messagePoder;
+    private String operacaoPoder;
     
     public int getVida() {
         return vida;
     }
 
-    public Poderes getPoder() {
-        return poder;
+    public PoderManager getPoderManager() {
+        return poderManager;
     }
 
     public void setVida(int vida) {
         this.vida = vida;
     }
 
-    public void setPoder(Poderes poder) {
-        this.poder = poder;
+    public void setPoderManager(PoderManager poderManager) {
+        this.poderManager = poderManager;
     }
 
     public boolean isDestrutivel() {
@@ -50,15 +50,15 @@ public class Bloco extends GameObject {
     }
     
     public boolean temPoder() {
-        return poder != null;
+        return poderManager != null;
     }  
 
-    public String getMessagePoder() {
-        return messagePoder;
+    public String getOperacaoPoder() {
+        return operacaoPoder;
     }
 
-    public void setMessagePoder(String messagePoder) {
-        this.messagePoder = messagePoder;
+    public void setOperacaoPoder(String operacaoPoder) {
+        this.operacaoPoder = operacaoPoder;
     }
 
     public boolean isPowerfull() {

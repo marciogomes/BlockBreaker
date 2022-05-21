@@ -9,7 +9,7 @@ package br.edu.eco405.blockbreaker.modelo;
  *
  * @author Márcio
  */
-public class PoderPlataforma implements Poderes {
+public class PoderManagerPlataforma implements PoderManager {
 
     public static final String ACELERA = "acelera";
     public static final String AUMENTA_TAMANHO = "aumenta_tamanho";
@@ -19,10 +19,10 @@ public class PoderPlataforma implements Poderes {
     public static final int FATOR_TAMANHO = 40;
 
     @Override
-    public void poder(PlayerObject playerObject, String op) {
-        if (playerObject instanceof Plataforma) {
-            Plataforma plataforma = (Plataforma) playerObject;
-            switch (op) {
+    public void aplicaPoder(PlayerObject alvo, String operacaoPoder) {
+        if (alvo instanceof Plataforma) {
+            Plataforma plataforma = (Plataforma) alvo;
+            switch (operacaoPoder) {
                 case ACELERA:
                     plataforma.setVelocidade(plataforma.getVelocidade() + FATOR_VELOC);
                     break;

@@ -9,6 +9,6 @@ package br.edu.eco405.blockbreaker.modelo;
  *
  * @author Márcio
  */
-public interface Poderes {
-    void poder(PlayerObject playerObject, String op);
+public interface PoderManager {
+    void aplicaPoder(PlayerObject alvo, String operacaoPoder);
 }

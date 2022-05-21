@@ -14,7 +14,7 @@ import javax.swing.ImageIcon;
  *
  * @author Márcio
  */
-public class PoderBola implements Poderes {
+public class PoderManagerBola implements PoderManager {
 
     public static final String ACELERA = "acelera";
     public static final String AUMENTA_DANO = "aumenta_dano";
@@ -28,10 +28,10 @@ public class PoderBola implements Poderes {
     Random gerador = new Random();
 
     @Override
-    public void poder(PlayerObject playerObject, String op) {
-        if (playerObject instanceof Bola) {
-            Bola bola = (Bola) playerObject;
-            switch (op) {
+    public void aplicaPoder(PlayerObject alvo, String operacaoPoder) {
+        if (alvo instanceof Bola) {
+            Bola bola = (Bola) alvo;
+            switch (operacaoPoder) {
                 case ACELERA:
                     bola.setVelocidade(bola.getVelocidade() + FATOR_VELOC);
                     break;

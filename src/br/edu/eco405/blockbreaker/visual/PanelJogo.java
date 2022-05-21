@@ -5,14 +5,9 @@
  */
 package br.edu.eco405.blockbreaker.visual;
 
-import br.edu.eco405.blockbreaker.modelo.Bloco;
-import br.edu.eco405.blockbreaker.modelo.Bola;
-import br.edu.eco405.blockbreaker.modelo.GameObject;
-import br.edu.eco405.blockbreaker.modelo.Plataforma;
-import br.edu.eco405.blockbreaker.modelo.PlayerObject;
-import br.edu.eco405.blockbreaker.modelo.PoderBola;
-import br.edu.eco405.blockbreaker.modelo.PoderPlataforma;
-import br.edu.eco405.blockbreaker.modelo.User;
+import br.edu.eco405.blockbreaker.modelo.*;
+import br.edu.eco405.blockbreaker.modelo.PoderManagerBola;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -72,10 +67,10 @@ public class PanelJogo extends JPanel {
     private ImageIcon imageLife;
     private ImageIcon imageInstructions;
 
-    private GameObject paredeCima;
-    private GameObject paredeBaixo;
-    private GameObject paredeDireita;
-    private GameObject paredeEsquerda;
+    private GameObject upperBoundary;
+    private GameObject lowerBoundary;
+    private GameObject rightBoundary;
+    private GameObject leftBoundary;
 
     public enum STATE {
         MENU,
@@ -88,215 +83,28 @@ public class PanelJogo extends JPanel {
 
     private final int[] setas = new int[2];       // vetor para evitar delay do teclado
 
-    private boolean flagRun;        // flag para quando o usuario inicia o jogo
-    private boolean flagWin;
-    private boolean flagInstructions;
+    private boolean isGameRunning;
+    private boolean isGameWon;
+    private boolean isInstructionMode;
+
     private double velocidadePlat;             // velocidade da plataforma
 
     /* Construtor da JPanel */
     public PanelJogo() throws IOException {
 
         this.setDoubleBuffered(true);   // dobra o buffer para desenhar
-        initGame();                     // inicia o jogo
+        initializeGame();                     // inicia o jogo
     }
 
-    private void initGame() throws FileNotFoundException, IOException {
-        /* Inicializa as componentes do jogo */
+    private void initializeGame() throws FileNotFoundException, IOException {
 
-        flagRun = false;
-        flagInstructions = true;
-        flagWin = false;
-
-        user = new User();
-        user.setScore(0);
-
-        /* Inicia a bola */
-        bolas = new ArrayList<>();
-        bola = new Bola();
-        bola.setX(BOLA_X);
-        bola.setY(BOLA_Y);
-        bola.setMask(new Rectangle(bola.getX(), bola.getY(), BOLA_MASK_WIDTH, BOLA_MASK_HEIGHT));
-        bola.setVelocidade(BOLA_VELOCIDADE);
-        bola.setDirecaoX(BOLA_DIRECAO_X);
-        bola.setDirecaoY(BOLA_DIRECAO_Y);
-        bola.setDano(BOLA_DANO);
-        bola.setState(Bola.STATE.NORMAL);
-        bola.getRender().add(new ImageIcon("res/bolas/bolaA.png"));
-        bola.getRender().add(new ImageIcon("res/bolas/bolaB.png"));
-        bola.getRender().add(new ImageIcon("res/bolas/bolaC.png"));
-        bolas.add(bola);
-
-        /* Inicia a plataforma */
-        plataforma = new Plataforma();
-        plataforma.setLife(INIT_LIFE);
-        plataforma.setX(PLAT_X);
-        plataforma.setY(PLAT_Y);
-        plataforma.setMask(new Rectangle(plataforma.getX(), plataforma.getY(), PLAT_MASK_WIDTH, PLAT_MASK_HEIGHT));
-        plataforma.setVelocidade(PLAT_VELOCIDADE);
-        plataforma.getRender().add(new ImageIcon("res/plataformas/plataformaA.png"));
-        plataforma.getRender().add(new ImageIcon("res/plataformas/plataformaB.png"));
-        plataforma.getRender().add(new ImageIcon("res/plataformas/plataformaC.png"));
-        plataforma.setState(Plataforma.STATE.NORMAL);
-
-        /* Inicia o mapa */
-        File fileMapa = new File("res/mapas/mapa1.txt");
-        if (!fileMapa.exists()) {
-            System.out.println("Arquivo de mapa não encontrado! Encerrando...");
-            this.setVisible(false); // poderia fechar o programa
-        }
-
-        blocos = new ArrayList<>();
-        BufferedReader readerMapa = new BufferedReader(
-                new FileReader(fileMapa)
-        );
-        String[] mapa = new String[10];
-        int k = 0;
-        while (readerMapa.ready()) {
-            mapa[k++] = readerMapa.readLine();
-        }
-
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 7; j++) {
-                Bloco b = new Bloco();
-                // seta as posicões do bloco
-
-                b.setX(7 + 90 * j);
-                b.setY(80 + 30 * i);
-
-                // le o arquivo de mapa e ve o tipo de bloco
-                switch (mapa[i].charAt(j)) {
-                    case '#': // bloco indestruivel
-                        b.setDestrutivel(false);
-                        b.setVida(-1);
-                        b.setPowerfull(false);
-                        b.setPoder(null);
-                        b.setMessagePoder(null);
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/blocoIndestrutivel.png"));
-                        break;
-
-                    case '1': // bloco destruivel - comum
-                        b.setDestrutivel(true);
-                        b.setVida(3);
-                        b.setPowerfull(false);
-                        b.setPoder(null);
-                        b.setMessagePoder(null);
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/bloco1A.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco1B.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco1C.png"));
-                        break;
-
-                    case '2': // bloco destruivel - poder plataforma: aumenta vida 
-                        b.setDestrutivel(true);
-                        b.setVida(3);
-                        b.setPowerfull(true);
-                        b.setPoder(new PoderPlataforma());
-                        b.setMessagePoder("aumenta_vida");
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/bloco2A.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco2B.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco2C.png"));
-                        break;
-                    case '3': // bloco destruivel - poder plataforma: aumenta velocidade da plat
-                        b.setDestrutivel(true);
-                        b.setVida(3);
-                        b.setPowerfull(true);
-                        b.setPoder(new PoderPlataforma());
-                        b.setMessagePoder("acelera");
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/bloco3A.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco3B.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco3C.png"));
-                        break;
-                    case '4': // bloco destruivel - poder plataforma: aumenta tamanho da plataforma
-                        b.setDestrutivel(true);
-                        b.setVida(3);
-                        b.setPowerfull(true);
-                        b.setPoder(new PoderPlataforma());
-                        b.setMessagePoder("aumenta_tamanho");
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/bloco4A.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco4B.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco4C.png"));
-                        break;
-                    case '5': // bloco destruivel - poder bola: aumenta dano da bola
-                        b.setDestrutivel(true);
-                        b.setVida(3);
-                        b.setPowerfull(true);
-                        b.setPoder(new PoderBola());
-                        b.setMessagePoder("aumenta_dano");
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/bloco5A.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco5B.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco5C.png"));
-                        break;
-                    case '6': // bloco destruivel - poder bola: aumenta tamanho da bola
-                        b.setDestrutivel(true);
-                        b.setVida(3);
-                        b.setPowerfull(true);
-                        b.setPoder(new PoderBola());
-                        b.setMessagePoder("aumenta_tamanho");
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/bloco6A.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco6B.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco6C.png"));
-                        break;
-                    case '7': // bloco destruivel - poder bola: aumenta velocidade
-                        b.setDestrutivel(true);
-                        b.setVida(3);
-                        b.setPowerfull(true);
-                        b.setPoder(new PoderBola());
-                        b.setMessagePoder("acelera");
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/bloco7A.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco7B.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco7C.png"));
-                        break;
-                    case '8': // bloco destruivel - poder bola: aumenta qnt de bolas
-                        b.setDestrutivel(true);
-                        b.setVida(3);
-                        b.setPowerfull(true);
-                        b.setPoder(new PoderBola());
-                        b.setMessagePoder("aumenta_quant");
-                        b.setState(Bloco.STATE.NORMAL);
-                        b.getRender().add(new ImageIcon("res/blocos/bloco8A.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco8B.png"));
-                        b.getRender().add(new ImageIcon("res/blocos/bloco8C.png"));
-                        break;
-                    case '-':
-                        continue;
-                }
-
-                b.setMask(new Rectangle(b.getX(), b.getY(), 80, 20));
-                blocos.add(b);
-            }
-        }
-
-        /* Outro elementos do jogo */
-        imageBackground = new ImageIcon("res/background.jpg");
-        imageLife = new ImageIcon("res/life.png");
-        imageInstructions = new ImageIcon("res/interface/instrucoes.png");
-
-        paredeCima = new GameObject();
-        paredeCima.setMask(new Rectangle(1, 25, 632, 1));
-        paredeCima.setX(paredeCima.getMaskX());
-        paredeCima.setY(paredeCima.getMaskY());
-
-        paredeBaixo = new GameObject();
-        paredeBaixo.setMask(new Rectangle(1, 559, 632, 1));
-        paredeBaixo.setX(paredeBaixo.getMaskX());
-        paredeBaixo.setY(paredeBaixo.getMaskY());
-
-        paredeEsquerda = new GameObject();
-        paredeEsquerda.setMask(new Rectangle(1, 26, 1, 533));
-        paredeEsquerda.setX(paredeEsquerda.getMaskX());
-        paredeEsquerda.setY(paredeEsquerda.getMaskY());
-
-        paredeDireita = new GameObject();
-        paredeDireita.setMask(new Rectangle(632, 26, 1, 533));
-        paredeDireita.setX(paredeDireita.getMaskX());
-        paredeDireita.setY(paredeDireita.getMaskY());
+        initializeGameStates();
+        initializeUser();
+        builderBalls();
+        builderPlatform();
+        builderBlocks();
+        builderBoundaries();
+        initializeImages();
 
         if (USER_MODE) {
             SoundEffects.init();
@@ -306,7 +114,7 @@ public class PanelJogo extends JPanel {
         this.addMouseMotionListener(new MouseMotion());
 
         loop();
-        inputData();
+        handleUserInputs();
     }
 
     void loop() {
@@ -338,12 +146,12 @@ public class PanelJogo extends JPanel {
                         System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                 bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                     }
-                    flagWin = true;
+                    isGameWon = true;
                     timer.stop();
                 }
 
                 /* Calcula o próximo movimento */
-                if (flagRun) {
+                if (isGameRunning) {
                     for (int i = 0; i < bolas.size(); i++) {
                         bolas.get(i).setMaskX((int) (bolas.get(i).getMaskX() + bolas.get(i).getDirecaoX() * bolas.get(i).getVelocidade()));
                         bolas.get(i).setMaskY((int) (bolas.get(i).getMaskY() + bolas.get(i).getDirecaoY() * bolas.get(i).getVelocidade()));
@@ -376,7 +184,7 @@ public class PanelJogo extends JPanel {
                 /* Detecta as colisões */
                 // Colisão bola - parede
                 for (int i = 0; i < bolas.size(); i++) {
-                    if (colisao(bolas.get(i), paredeEsquerda)) {
+                    if (colisao(bolas.get(i), leftBoundary)) {
                         if (DEBUG_MODE) {
                             System.out.printf("COLISAO BOLA - PAREDE ESQ\n");
                             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
@@ -390,7 +198,7 @@ public class PanelJogo extends JPanel {
                     }
                 }
                 for (int i = 0; i < bolas.size(); i++) {
-                    if (colisao(bolas.get(i), paredeDireita)) {
+                    if (colisao(bolas.get(i), rightBoundary)) {
                         if (DEBUG_MODE) {
                             System.out.printf("COLISAO BOLA - PAREDE DIR\n");
                             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
@@ -404,7 +212,7 @@ public class PanelJogo extends JPanel {
                     }
                 }
                 for (int i = 0; i < bolas.size(); i++) {
-                    if (colisao(bolas.get(i), paredeCima)) {
+                    if (colisao(bolas.get(i), upperBoundary)) {
                         if (DEBUG_MODE) {
                             System.out.printf("COLISAO BOLA - PAREDE CIMA\n");
                             System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
@@ -419,7 +227,7 @@ public class PanelJogo extends JPanel {
                 }
 
                 for (int i = 0; i < bolas.size(); i++) {
-                    if (colisao(bolas.get(i), paredeBaixo)) {
+                    if (colisao(bolas.get(i), lowerBoundary)) {
 
                         if (DEBUG_MODE) {
                             System.out.printf("PERDEU UMA VIDA\n");
@@ -436,7 +244,7 @@ public class PanelJogo extends JPanel {
                             // perde uma vida
                             plataforma.setLife(plataforma.getLife() - 1);
                             // volta a bola e plataforma na posição inicial
-                            flagRun = false;
+                            isGameRunning = false;
                             bola.setMaskWidth(20);
                             bola.setMaskHeight(20);
                             bola.setState(Bola.STATE.NORMAL);
@@ -494,14 +302,14 @@ public class PanelJogo extends JPanel {
                 }
 
                 // Colisão plataforma - parede
-                if (colisao(plataforma, paredeEsquerda)) {
+                if (colisao(plataforma, leftBoundary)) {
                     if (DEBUG_MODE) {
                         System.out.printf("COLISAO PLATAFORMA - PAREDE ESQ\n");
                         System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                 bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                     }
                 }
-                if (colisao(plataforma, paredeDireita)) {
+                if (colisao(plataforma, rightBoundary)) {
                     if (DEBUG_MODE) {
                         System.out.printf("COLISAO PLATAFORMA - PAREDE DIR\n");
                         System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
@@ -536,15 +344,15 @@ public class PanelJogo extends JPanel {
                                         SoundEffects.POWER.play();
                                     }
 
-                                    if (blocos.get(j).getPoder() instanceof PoderBola) {
-                                        blocos.get(j).getPoder().poder(bolas.get(i), blocos.get(j).getMessagePoder());
+                                    if (blocos.get(j).getPoderManager() instanceof PoderManagerBola) {
+                                        blocos.get(j).getPoderManager().aplicaPoder(bolas.get(i), blocos.get(j).getOperacaoPoder());
                                     } else {
-                                        blocos.get(j).getPoder().poder(plataforma, blocos.get(j).getMessagePoder());
+                                        blocos.get(j).getPoderManager().aplicaPoder(plataforma, blocos.get(j).getOperacaoPoder());
                                     }
 
                                     blocos.get(j).setPowerfull(false);
-                                    blocos.get(j).setPoder(null);
-                                    blocos.get(j).setMessagePoder(null);
+                                    blocos.get(j).setPoderManager(null);
+                                    blocos.get(j).setOperacaoPoder(null);
                                 }
 
                                 switch (blocos.get(j).getVida()) {
@@ -595,15 +403,13 @@ public class PanelJogo extends JPanel {
         timer.start();
     }
 
-    void inputData() {
+    void handleUserInputs() {
         /* Controle do teclado */
         this.setFocusable(true);
         this.addKeyListener(new KeyListener() {
 
             @Override
-            public void keyTyped(KeyEvent ke) {
-                // code
-            }
+            public void keyTyped(KeyEvent ke) { }
 
             @Override
             public void keyPressed(KeyEvent ke) {
@@ -611,14 +417,14 @@ public class PanelJogo extends JPanel {
                     switch (ke.getKeyCode()) {
 
                         case KeyEvent.VK_SPACE:
-                            if (!flagRun) {
+                            if (!isGameRunning) {
                                 if (DEBUG_MODE) {
                                     System.out.printf("INICIO JOGO\n\n");
                                     System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                             bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                                 }
-                                flagRun = true;
-                                flagInstructions = false;
+                                isGameRunning = true;
+                                isInstructionMode = false;
                             }
                             break;
 
@@ -780,10 +586,10 @@ public class PanelJogo extends JPanel {
 
             /* parede */
             g2d.setColor(Color.BLACK);
-            g2d.draw(paredeCima.getMask());
-            g2d.draw(paredeBaixo.getMask());
-            g2d.draw(paredeDireita.getMask());
-            g2d.draw(paredeEsquerda.getMask());
+            g2d.draw(upperBoundary.getMask());
+            g2d.draw(lowerBoundary.getMask());
+            g2d.draw(rightBoundary.getMask());
+            g2d.draw(leftBoundary.getMask());
 
             /* INFO */
             g2d.drawString("STATE" + " = " + state, 1, 15);
@@ -792,7 +598,7 @@ public class PanelJogo extends JPanel {
             g2d.drawString("VEL BOLA" + " = " + bola.getVelocidade(), 300, 15);
             g2d.drawString("VEL PLAT" + " = " + velocidadePlat, 400, 15);
 
-            if (flagWin) {
+            if (isGameWon) {
 
                 g2d.setColor(Color.YELLOW);
                 g2d.fillRect(150, 235, 320, 70);
@@ -845,11 +651,11 @@ public class PanelJogo extends JPanel {
                     g2d.drawString("SCORE" + " " + String.format("%08d", user.getScore()), 333, 50);
 
                     // MENUS
-                    if (flagInstructions) {
+                    if (isInstructionMode) {
                         g2d.drawImage(imageInstructions.getImage(), 70, 150, this);
                     }
 
-                    if (flagWin) {
+                    if (isGameWon) {
 
                         SoundEffects.WIN.play();
 
@@ -882,5 +688,212 @@ public class PanelJogo extends JPanel {
 
             }
         }
+    }
+
+    public void initializeGameStates() {
+        isGameRunning = false;
+        isInstructionMode = true;
+        isGameWon = false;
+    }
+
+    public void initializeUser() {
+        user = new User();
+        user.setScore(0);
+    }
+
+    public void builderBalls() {
+        bolas = new ArrayList<>();
+
+        bola = new Bola();
+        bola.setX(BOLA_X);
+        bola.setY(BOLA_Y);
+        bola.setMask(new Rectangle(bola.getX(), bola.getY(), BOLA_MASK_WIDTH, BOLA_MASK_HEIGHT));
+        bola.setVelocidade(BOLA_VELOCIDADE);
+        bola.setDirecaoX(BOLA_DIRECAO_X);
+        bola.setDirecaoY(BOLA_DIRECAO_Y);
+        bola.setDano(BOLA_DANO);
+        bola.setState(Bola.STATE.NORMAL);
+        bola.getRender().add(new ImageIcon("res/bolas/bolaA.png"));
+        bola.getRender().add(new ImageIcon("res/bolas/bolaB.png"));
+        bola.getRender().add(new ImageIcon("res/bolas/bolaC.png"));
+
+        bolas.add(bola);
+    }
+
+    public void builderPlatform() {
+        plataforma = new Plataforma();
+        plataforma.setLife(INIT_LIFE);
+        plataforma.setX(PLAT_X);
+        plataforma.setY(PLAT_Y);
+        plataforma.setMask(new Rectangle(plataforma.getX(), plataforma.getY(), PLAT_MASK_WIDTH, PLAT_MASK_HEIGHT));
+        plataforma.setVelocidade(PLAT_VELOCIDADE);
+        plataforma.getRender().add(new ImageIcon("res/plataformas/plataformaA.png"));
+        plataforma.getRender().add(new ImageIcon("res/plataformas/plataformaB.png"));
+        plataforma.getRender().add(new ImageIcon("res/plataformas/plataformaC.png"));
+        plataforma.setState(Plataforma.STATE.NORMAL);
+    }
+
+    public void builderBlocks() throws IOException {
+        File fileMapa = new File("res/mapas/mapa1.txt");
+        if (!fileMapa.exists()) {
+            System.out.println("Arquivo de mapa não encontrado! Encerrando...");
+            this.setVisible(false); // poderia fechar o programa
+        }
+
+        blocos = new ArrayList<>();
+        BufferedReader readerMapa = new BufferedReader(
+                new FileReader(fileMapa)
+        );
+        String[] mapa = new String[10];
+        int k = 0;
+        while (readerMapa.ready()) {
+            mapa[k++] = readerMapa.readLine();
+        }
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 7; j++) {
+                Bloco b = new Bloco();
+                // seta as posicões do bloco
+
+                b.setX(7 + 90 * j);
+                b.setY(80 + 30 * i);
+
+                // le o arquivo de mapa e ve o tipo de bloco
+                switch (mapa[i].charAt(j)) {
+                    case '#': // bloco indestruivel
+                        b.setDestrutivel(false);
+                        b.setVida(-1);
+                        b.setPowerfull(false);
+                        b.setPoderManager(null);
+                        b.setOperacaoPoder(null);
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/blocoIndestrutivel.png"));
+                        break;
+
+                    case '1': // bloco destruivel - comum
+                        b.setDestrutivel(true);
+                        b.setVida(3);
+                        b.setPowerfull(false);
+                        b.setPoderManager(null);
+                        b.setOperacaoPoder(null);
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/bloco1A.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco1B.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco1C.png"));
+                        break;
+
+                    case '2': // bloco destruivel - poder plataforma: aumenta vida
+                        b.setDestrutivel(true);
+                        b.setVida(3);
+                        b.setPowerfull(true);
+                        b.setPoderManager(new PoderManagerPlataforma());
+                        b.setOperacaoPoder("aumenta_vida");
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/bloco2A.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco2B.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco2C.png"));
+                        break;
+                    case '3': // bloco destruivel - poder plataforma: aumenta velocidade da plat
+                        b.setDestrutivel(true);
+                        b.setVida(3);
+                        b.setPowerfull(true);
+                        b.setPoderManager(new PoderManagerPlataforma());
+                        b.setOperacaoPoder("acelera");
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/bloco3A.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco3B.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco3C.png"));
+                        break;
+                    case '4': // bloco destruivel - poder plataforma: aumenta tamanho da plataforma
+                        b.setDestrutivel(true);
+                        b.setVida(3);
+                        b.setPowerfull(true);
+                        b.setPoderManager(new PoderManagerPlataforma());
+                        b.setOperacaoPoder("aumenta_tamanho");
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/bloco4A.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco4B.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco4C.png"));
+                        break;
+                    case '5': // bloco destruivel - poder bola: aumenta dano da bola
+                        b.setDestrutivel(true);
+                        b.setVida(3);
+                        b.setPowerfull(true);
+                        b.setPoderManager(new PoderManagerBola());
+                        b.setOperacaoPoder("aumenta_dano");
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/bloco5A.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco5B.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco5C.png"));
+                        break;
+                    case '6': // bloco destruivel - poder bola: aumenta tamanho da bola
+                        b.setDestrutivel(true);
+                        b.setVida(3);
+                        b.setPowerfull(true);
+                        b.setPoderManager(new PoderManagerBola());
+                        b.setOperacaoPoder("aumenta_tamanho");
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/bloco6A.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco6B.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco6C.png"));
+                        break;
+                    case '7': // bloco destruivel - poder bola: aumenta velocidade
+                        b.setDestrutivel(true);
+                        b.setVida(3);
+                        b.setPowerfull(true);
+                        b.setPoderManager(new PoderManagerBola());
+                        b.setOperacaoPoder("acelera");
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/bloco7A.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco7B.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco7C.png"));
+                        break;
+                    case '8': // bloco destruivel - poder bola: aumenta qnt de bolas
+                        b.setDestrutivel(true);
+                        b.setVida(3);
+                        b.setPowerfull(true);
+                        b.setPoderManager(new PoderManagerBola());
+                        b.setOperacaoPoder("aumenta_quant");
+                        b.setState(Bloco.STATE.NORMAL);
+                        b.getRender().add(new ImageIcon("res/blocos/bloco8A.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco8B.png"));
+                        b.getRender().add(new ImageIcon("res/blocos/bloco8C.png"));
+                        break;
+                    case '-':
+                        continue;
+                }
+
+                b.setMask(new Rectangle(b.getX(), b.getY(), 80, 20));
+                blocos.add(b);
+            }
+        }
+    }
+
+    public void builderBoundaries() {
+        upperBoundary = new GameObject();
+        upperBoundary.setMask(new Rectangle(1, 25, 632, 1));
+        upperBoundary.setX(upperBoundary.getMaskX());
+        upperBoundary.setY(upperBoundary.getMaskY());
+
+        lowerBoundary = new GameObject();
+        lowerBoundary.setMask(new Rectangle(1, 559, 632, 1));
+        lowerBoundary.setX(lowerBoundary.getMaskX());
+        lowerBoundary.setY(lowerBoundary.getMaskY());
+
+        leftBoundary = new GameObject();
+        leftBoundary.setMask(new Rectangle(1, 26, 1, 533));
+        leftBoundary.setX(leftBoundary.getMaskX());
+        leftBoundary.setY(leftBoundary.getMaskY());
+
+        rightBoundary = new GameObject();
+        rightBoundary.setMask(new Rectangle(632, 26, 1, 533));
+        rightBoundary.setX(rightBoundary.getMaskX());
+        rightBoundary.setY(rightBoundary.getMaskY());
+    }
+
+    public void initializeImages() {
+        imageBackground = new ImageIcon("res/background.jpg");
+        imageLife = new ImageIcon("res/life.png");
+        imageInstructions = new ImageIcon("res/interface/instrucoes.png");
     }
 }
