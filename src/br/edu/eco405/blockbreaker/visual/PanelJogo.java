@@ -81,7 +81,11 @@ public class PanelJogo extends JPanel {
 
     public static STATE state = STATE.MENU; // jogo começa no menu principal
 
-    private final int[] setas = new int[2];       // vetor para evitar delay do teclado
+    private final boolean[] isArrowKeyPressed = new boolean[2];       // vetor para evitar delay do teclado
+    private enum DIRECTION {
+        LEFT,
+        RIGHT
+    }
 
     private boolean isGameRunning;
     private boolean isGameWon;
@@ -93,7 +97,7 @@ public class PanelJogo extends JPanel {
     public PanelJogo() throws IOException {
 
         this.setDoubleBuffered(true);   // dobra o buffer para desenhar
-        initializeGame();                     // inicia o jogo
+        initializeGame();
     }
 
     private void initializeGame() throws FileNotFoundException, IOException {
@@ -161,25 +165,29 @@ public class PanelJogo extends JPanel {
                     bolas.get(0).setMaskX(plataforma.getMaskX() + 40);
                 }
 
-                /* aceleração da plataforma */
-                /* uso uma variavel auxiliar para velocidade da plataforma
+                /* aceleração da plataforma
+                 * uso uma variavel auxiliar para velocidade da plataforma
                  * pois sem ela, o efeito de aceleração cancelaria o
                  * power-up de velocidade
                  */
-                if (setas[1] == 1 || setas[0] == 1) {
+                if (isArrowKeyPressed[DIRECTION.LEFT.ordinal()]
+                        || isArrowKeyPressed[DIRECTION.RIGHT.ordinal()]) {
                     velocidadePlat += .5;
                     if (velocidadePlat > (plataforma.getVelocidade() + 20)) {
                         velocidadePlat = (plataforma.getVelocidade() + 20);
                     }
-                    if (setas[1] == 1 && setas[0] == 1) {
+                    if (isArrowKeyPressed[DIRECTION.LEFT.ordinal()]
+                            && isArrowKeyPressed[DIRECTION.RIGHT.ordinal()]) {
                         velocidadePlat = plataforma.getVelocidade();
                     }
                 } else {
                     velocidadePlat = plataforma.getVelocidade();
                 }
 
-                plataforma.setMaskX((int) (plataforma.getMaskX() + setas[1] * velocidadePlat
-                        - setas[0] * velocidadePlat));
+                plataforma.setMaskX((int) (plataforma.getMaskX()
+                        + (isArrowKeyPressed[DIRECTION.RIGHT.ordinal()] ? 1 : 0) * velocidadePlat
+                        - (isArrowKeyPressed[DIRECTION.LEFT.ordinal()] ? 1 : 0) * velocidadePlat)
+                );
 
                 /* Detecta as colisões */
                 // Colisão bola - parede
@@ -286,7 +294,8 @@ public class PanelJogo extends JPanel {
                         }
 
                         // transfere 5% da velocidade da plataforma para a bola e muda angulo
-                        if (setas[0] == 1 || setas[1] == 1) {
+                        if (isArrowKeyPressed[DIRECTION.LEFT.ordinal()]
+                                || isArrowKeyPressed[DIRECTION.RIGHT.ordinal()]) {
                             bolas.get(i).setVelocidade((int) (bolas.get(i).getVelocidade() + velocidadePlat * 0.05));
                             bolas.get(i).setDirecaoX(bolas.get(i).getDirecaoX() * 0.8);
                         } else {
@@ -455,7 +464,7 @@ public class PanelJogo extends JPanel {
                                 System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                         bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                             }
-                            setas[0] = 1;
+                            isArrowKeyPressed[DIRECTION.LEFT.ordinal()] = true;
                             break;
 
                         case KeyEvent.VK_RIGHT:
@@ -464,7 +473,7 @@ public class PanelJogo extends JPanel {
                                 System.out.printf("Bola: x = %d y = %d\nPlataforma: x = %d y = %d\n\n",
                                         bola.getX(), bola.getY(), plataforma.getX(), plataforma.getY());
                             }
-                            setas[1] = 1;
+                            isArrowKeyPressed[DIRECTION.RIGHT.ordinal()] = true;
                             break;
                     }
                 }
@@ -475,10 +484,10 @@ public class PanelJogo extends JPanel {
                 if (state == STATE.GAME || state == STATE.PAUSE) {
                     switch (ke.getKeyCode()) {
                         case KeyEvent.VK_LEFT:
-                            setas[0] = 0;
+                            isArrowKeyPressed[DIRECTION.LEFT.ordinal()] = false;
                             break;
                         case KeyEvent.VK_RIGHT:
-                            setas[1] = 0;
+                            isArrowKeyPressed[DIRECTION.RIGHT.ordinal()] = false;
                             break;
                     }
                 }
