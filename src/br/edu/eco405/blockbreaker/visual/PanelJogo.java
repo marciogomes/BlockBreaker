@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -100,7 +99,7 @@ public class PanelJogo extends JPanel {
         initializeGame();
     }
 
-    private void initializeGame() throws FileNotFoundException, IOException {
+    private void initializeGame() throws IOException {
 
         initializeGameStates();
         initializeUser();
@@ -161,7 +160,6 @@ public class PanelJogo extends JPanel {
                         bolas.get(i).setMaskY((int) (bolas.get(i).getMaskY() + bolas.get(i).getDirecaoY() * bolas.get(i).getVelocidade()));
                     }
                 } else {
-                    //bola.setMaskX(bola.getMaskX() + setas[1] * bola.getVelocidade() - setas[0] * bola.getVelocidade());
                     bolas.get(0).setMaskX(plataforma.getMaskX() + 40);
                 }
 
