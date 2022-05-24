@@ -6,6 +6,7 @@
 package br.edu.eco405.blockbreaker.visual;
 
 import br.edu.eco405.blockbreaker.modelo.*;
+import br.edu.eco405.blockbreaker.modelo.GameState;
 import br.edu.eco405.blockbreaker.modelo.PoderManagerBola;
 
 import java.awt.Color;
@@ -31,28 +32,10 @@ import java.io.IOException;
  *
  * @author Márcio
  */
-public class PanelJogo extends JPanel {
+public class PanelJogo extends JPanel implements GameConstants {
 
     public static final boolean DEBUG_MODE = false;
     public static final boolean USER_MODE = true;
-
-    public static final int FPS = 60;
-    public static final int INIT_LIFE = 3;
-
-    public static final int BOLA_X = 290;
-    public static final int BOLA_Y = 499;
-    public static final int BOLA_MASK_WIDTH = 20;
-    public static final int BOLA_MASK_HEIGHT = 20;
-    public static final double BOLA_VELOCIDADE = 5.0;
-    public static final double BOLA_DIRECAO_X = 1.0;
-    public static final double BOLA_DIRECAO_Y = 1.0;
-    public static final int BOLA_DANO = 1;
-
-    public static int PLAT_X = 250;
-    public static int PLAT_Y = 520;
-    public static final int PLAT_MASK_WIDTH = 100;
-    public static final int PLAT_MASK_HEIGHT = 20;
-    public static final double PLAT_VELOCIDADE = 10.0;
 
     private User user;
     public static Timer timer;
@@ -71,14 +54,7 @@ public class PanelJogo extends JPanel {
     private GameObject rightBoundary;
     private GameObject leftBoundary;
 
-    public enum STATE {
-        MENU,
-        GAME,
-        PAUSE,
-        GAME_OVER
-    }
-
-    public static STATE state = STATE.MENU; // jogo começa no menu principal
+    public static GameState state = GameState.MENU; // jogo começa no menu principal
 
     private final boolean[] isArrowKeyPressed = new boolean[2];       // vetor para evitar delay do teclado
     private enum DIRECTION {
@@ -138,7 +114,7 @@ public class PanelJogo extends JPanel {
                     if (USER_MODE) {
                         SoundEffects.GAME_OVER.play();
                     }
-                    state = STATE.GAME_OVER;
+                    state = GameState.GAME_OVER;
                     timer.stop();
                 }
 
@@ -420,7 +396,7 @@ public class PanelJogo extends JPanel {
 
             @Override
             public void keyPressed(KeyEvent ke) {
-                if (state == STATE.GAME || state == STATE.PAUSE) {
+                if (state == GameState.GAME || state == GameState.PAUSE) {
                     switch (ke.getKeyCode()) {
 
                         case KeyEvent.VK_SPACE:
@@ -446,12 +422,12 @@ public class PanelJogo extends JPanel {
                                 SoundEffects.MENU_CLICK.play();
                             }
 
-                            if (state == STATE.GAME) {
-                                state = STATE.PAUSE;
+                            if (state == GameState.GAME) {
+                                state = GameState.PAUSE;
                                 timer.stop();
                                 repaint();
                             } else {
-                                state = STATE.GAME;
+                                state = GameState.GAME;
                                 timer.restart();
                             }
                             break;
@@ -479,7 +455,7 @@ public class PanelJogo extends JPanel {
 
             @Override
             public void keyReleased(KeyEvent ke) {
-                if (state == STATE.GAME || state == STATE.PAUSE) {
+                if (state == GameState.GAME || state == GameState.PAUSE) {
                     switch (ke.getKeyCode()) {
                         case KeyEvent.VK_LEFT:
                             isArrowKeyPressed[DIRECTION.LEFT.ordinal()] = false;

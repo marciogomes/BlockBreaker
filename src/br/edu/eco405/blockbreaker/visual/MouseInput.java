@@ -5,6 +5,8 @@
  */
 package br.edu.eco405.blockbreaker.visual;
 
+import br.edu.eco405.blockbreaker.modelo.GameState;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JOptionPane;
@@ -34,13 +36,13 @@ public class MouseInput implements MouseListener {
                             SoundEffects.MENU_CLICK.play();
                         }
 
-                        PanelJogo.state = PanelJogo.STATE.GAME;
+                        PanelJogo.state = GameState.GAME;
                     }
 
                     /* implementar o about */
                     // sai do jogo
                     if (x >= 440 && x <= 590 && y >= 440 && y <= 470) {
-                        PanelJogo.state = PanelJogo.STATE.GAME_OVER;
+                        PanelJogo.state = GameState.GAME_OVER;
                         System.exit(0);
                     }
                     break;
@@ -49,13 +51,13 @@ public class MouseInput implements MouseListener {
                     // inicia o jogo
                     if (x >= 40 && x <= 190 && y >= 440 && y <= 470) {
 
-                        PanelJogo.state = PanelJogo.STATE.GAME;
+                        PanelJogo.state = GameState.GAME;
                         PanelJogo.timer.restart();
                     }
 
                     // sai do jogo
                     if (x >= 440 && x <= 590 && y >= 440 && y <= 470) {
-                        PanelJogo.state = PanelJogo.STATE.GAME_OVER;
+                        PanelJogo.state = GameState.GAME_OVER;
                         System.exit(0);
                     }
                     break;
@@ -73,7 +75,7 @@ public class MouseInput implements MouseListener {
                     if (x >= 200 && x <= 450 && y >= 300 && y <= 358) {
                         SoundEffects.MENU_CLICK.play();
 
-                        PanelJogo.state = PanelJogo.STATE.GAME;
+                        PanelJogo.state = GameState.GAME;
                     }
 
                     if (x >= 200 && x <= 450 && y >= 375 && y <= 433) {
@@ -85,7 +87,7 @@ public class MouseInput implements MouseListener {
 
                     // sai do jogo
                     if (x >= 200 && x <= 450 && y >= 450 && y <= 508) {
-                        PanelJogo.state = PanelJogo.STATE.GAME_OVER;
+                        PanelJogo.state = GameState.GAME_OVER;
                         System.exit(0);
                     }
                     break;
@@ -95,7 +97,7 @@ public class MouseInput implements MouseListener {
                     if (x >= 200 && x <= 450 && y >= 300 && y <= 350) {
                         SoundEffects.MENU_CLICK.play();
 
-                        PanelJogo.state = PanelJogo.STATE.GAME;
+                        PanelJogo.state = GameState.GAME;
                         PanelJogo.timer.restart();
                     }
 
@@ -107,7 +109,7 @@ public class MouseInput implements MouseListener {
                     
                     // sai do jogo
                     if (x >= 200 && x <= 450 && y >= 450 && y <= 500) {
-                        PanelJogo.state = PanelJogo.STATE.GAME_OVER;
+                        PanelJogo.state = GameState.GAME_OVER;
                         System.exit(0);
                     }
                     break;

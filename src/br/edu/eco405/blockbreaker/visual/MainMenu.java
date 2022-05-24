@@ -16,7 +16,7 @@ import javax.swing.ImageIcon;
  *
  * @author Márcio
  */
-public class MainMenu implements GameState {
+public class MainMenu implements GameHandling {
 
     Graphics2D g2d;
     ImageObserver im;

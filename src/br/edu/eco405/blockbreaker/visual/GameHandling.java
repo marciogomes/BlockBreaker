@@ -9,7 +9,7 @@ package br.edu.eco405.blockbreaker.visual;
  *
  * @author Márcio
  */
-public interface GameState {
+public interface GameHandling {
     void paint();
     void dispose();
 }

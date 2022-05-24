@@ -14,7 +14,7 @@ import java.awt.image.ImageObserver;
  *
  * @author Márcio
  */
-public class GameOverMenu implements GameState{
+public class GameOverMenu implements GameHandling {
     
     Graphics2D g2d;
     ImageObserver im;

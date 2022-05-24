@@ -5,6 +5,8 @@
  */
 package br.edu.eco405.blockbreaker.visual;
 
+import br.edu.eco405.blockbreaker.modelo.GameState;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
@@ -62,7 +64,7 @@ public class MouseMotion implements MouseMotionListener {
 
         if (PanelJogo.USER_MODE) {
 
-            if (PanelJogo.state != PanelJogo.STATE.GAME && PanelJogo.state != PanelJogo.STATE.GAME_OVER) {
+            if (PanelJogo.state != GameState.GAME && PanelJogo.state != GameState.GAME_OVER) {
 
                 if ((x >= 200 && x <= 450 && y >= 300 && y <= 350)
                         || (x >= 200 && x <= 450 && y >= 375 && y <= 425)
